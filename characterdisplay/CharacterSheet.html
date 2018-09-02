@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<title>Default Character Sheet</title>
+		<style>
+		
+		body {
+			font-family: Calibri;
+			margin: 0;
+			padding: 0;
+			min-width: 750px;
+		}
+		
+		.dot {
+		  height: 25px;
+		  width: 25px;
+		  background-color: #bbb;
+		  border-radius: 50%;
+		  display: inline-block;
+		}
+		
+		.headerBase {
+			z-index: 100;
+		}
+		
+		.header {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			background: #0C1754;
+			color: #fff;
+			position: fixed;
+			top: 0;
+			width: 100%;
+			height: 50px;
+			-webkit-transform: translateZ(0);
+		    -moz-transform: translateZ(0);
+		    -ms-transform: translateZ(0);
+		    -o-transform: translateZ(0);
+		    transform: translateZ(0);
+		}
+		
+		.listHead a {
+			padding: 0px 20px;
+			position: fixed;
+			height: 50px;
+			vertical-align: middle;
+			text-align: center;
+			line-height: 45px; 
+		}
+		
+		.listTail svg {
+			left: 100%;
+			transform: translate(-100%, 0%);
+			padding: 0px 0px;
+			position: fixed;
+		}
+		
+		.listTail menuBtn {
+			display: none;
+		}
+		
+		.header li a:hover {
+			background-color: #1E2B6F;
+		}
+		
+		.listHead {
+			display: inline;
+			color: white;
+			text-align: center;
+			padding: 1px 0px;
+			text-decoration: none;
+			font-size: 18px;
+		}
+		
+		.listTail {
+			display: inline;
+			color: white;
+			text-align: center;
+			padding: 1px 0px;
+			text-decoration: none;
+			font-size: 18px;
+		}
+		
+		@keyframes shiftLeft {
+			from {margin-left: 50%; -webkit-transform: translateX(-50%);}
+			to {margin-left: 0%; -webkit-transform: translateX(0);}
+		}
+		
+		@keyframes shiftRight {
+			from {margin-left: 0%; -webkit-transform: translateX(0%);}
+			to {margin-left: 50%; -webkit-transform: translateX(-50%);}
+		}
+		
+		@keyframes shiftLeftMenu {
+			from {-webkit-transform: translateX(0%);}
+			to {-webkit-transform: translateX(-100%);}
+		}
+		
+		@keyframes shiftRightMenu {
+			from {-webkit-transform: translateX(-100%);}
+			to {-webkit-transform: translateX(0%);}
+		}
+		
+		.displayDiv {
+			position: relative;
+			width: 70%;
+			min-width: 750px;
+			margin-left: 50%;
+			z-index: -1;	
+			-webkit-transform: translateZ(0);
+		    -moz-transform: translateZ(0);
+		    -ms-transform: translateZ(0);
+		    -o-transform: translateZ(0);
+		    transform: translateZ(0);
+			-webkit-transform: translateX(-50%);			
+		}
+		
+		.display {
+			z-index: -1;
+			margin-top: 50px;
+			width: 100%;
+			height: 100%;
+
+		}
+		
+		#menuBtn {
+			-webkit-transform: translateZ(0);
+		    -moz-transform: translateZ(0);
+		    -ms-transform: translateZ(0);
+		    -o-transform: translateZ(0);
+		    transform: translateZ(0);
+			width: 30%;
+			min-width: 300px;
+			display: none;
+		}
+		
+		.sideDiv {
+			display: none;
+			background-color: #dfdfdf;
+			margin-top: 50px;
+			z-index: 200;
+			position: fixed;
+			width: 30%;
+			min-width: 300px;
+			height: 100%;
+			margin-left: 100%;
+			-webkit-transform: translateZ(0);
+		    -moz-transform: translateZ(0);
+		    -ms-transform: translateZ(0);
+		    -o-transform: translateZ(0);
+		    transform: translateZ(0);
+			-webkit-transform: translateX(-100%);
+		}
+		
+		.sideDiv .section {
+			background-color: #eee;
+			color: black;
+			display: block;
+			padding: 12px;
+			font-size: 20px;
+			-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+			-moz-user-select: none; /* Firefox */
+			-ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+		}
+
+		.sideDiv .subSection {
+			display: none;
+			background-color: #fff;
+			color: black;
+			display: block;
+			padding: 12px;
+			font-size: 20px;
+			transform: translateX(3px);
+		}
+		
+		.menuList {
+			min-width: 200px;
+		}
+		
+		.menuList li a {
+			padding: 0px 20px;
+			position: fixed;
+			height: 50px;
+			vertical-align: middle;
+			text-align: center;
+			line-height: 45px; 
+		}
+		
+		text.nameType {
+			text-transform: capitalize;
+			font-size: 25px;
+			stroke-opacity: 0;
+		}
+		
+		text.descType {
+			text-transform: capitalize;
+			font-size: 16px;
+			stroke-opacity: 0;
+		}
+		
+		text.statType {
+			font-size: 40px; 
+			text-anchor: middle;
+			stroke-opacity: 0;
+		}
+		
+		text.statModType {
+			font-size: 14px;
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.profType {
+			font-size: 12px;
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.genericType0 {
+			font-size: 18px; 
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.genericType1 {
+			font-size: 22px; 
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.genericType2 {
+			font-size: 30px; 
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.genericType3 {
+			font-size: 34px; 
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		text.genericType4 {
+			font-size: 47px; 
+			text-anchor:middle;
+			stroke-opacity: 0;
+		}
+		
+		</style>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="CharacterSheet.js"></script>
+		<script src="ObjectInterface.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+		
+			const socket = io();
+			let charID = 'kavaproazheck';
+			const sType = 'characterSheet_' + charID;
+			
+			$(document).ready( () => {
+			
+				const 
+					header = $("#pageHeader"),
+					sticky = header.offsetTop;
+					
+				console.log(header)
+					
+				window.onscroll = () => {
+					if (window.pageYOffset > sticky) {
+						header.classList.add('sticky');
+					} else {
+						header.classList.remove('sticky');
+					};
+				};
+				socket.on('serverReadyForSocketType', () => {
+					socket.emit('clientSentSocketType', sType);
+				});
+
+				socket.on('serverReceivedSocketType', () => {
+					socket.emit('clientRequesting', charID);
+					
+					socket.on('serverSending', (data) => {
+						socket.emit('clientReceivedData');
+						renderCharacterSheet(JSON.parse(data));
+					});
+				});
+				
+				$('.subSection').hide();
+				
+				$('.section').click((event) => {
+					$('[id=' + event.target.id + 'Sub]').toggle();
+				});
+			});
+		</script>
+		<script>
+			let menu = false;
+			function toggleMenu() {
+				if (!menu) {
+					shiftLeftDisplay();
+					menu = true;
+				} else {
+					shiftRightDisplay();
+					menu = false;
+				}
+			}
+			
+			function translateMenuElemLeft(name) {			
+				$('#'+name).css({
+					'display': 'block',
+					'-webkit-transform': 'translateX(-100%)',
+					'animation-name': 'shiftLeftMenu',
+					'animation-duration': '0.2s'
+				});	
+			}
+			
+			function translateMenuElemRight(name) {
+				$('#'+name).css({
+					'-webkit-transform': 'translateX(0%)',
+					'animation-name': 'shiftRightMenu',
+					'animation-duration': '0.2s'
+				});
+
+				setTimeout(() => $('#'+name).css('none', 300));
+			}
+			
+			
+			function shiftLeftDisplay() {
+				translateMenuElemLeft('charMenu');
+				translateMenuElemLeft('menuBtn');
+				
+				$('#sheetDiv').css({
+					'-webkit-transform': 'translateX(0%)',
+					'animation-name': 'shiftLeft',
+					'animation-duration': '0.2s',
+					'margin-left': '0'
+				});
+			}
+			
+			function shiftRightDisplay() {
+				translateMenuElemRight('charMenu');
+				translateMenuElemRight('menuBtn');
+				$('#sheetDiv').css({
+					'-webkit-transform': 'translateX(-50%)',
+					'animation-name': 'shiftRight',
+					'animation-duration': '0.2s',
+					'margin-left': '50%'
+				});
+			}
+		</script>
+		<script>
+		function addItem(item) {
+			console.log($('#inventorySub:last'));
+			if ($('#inventorySub:last').length > 0) {
+				$('#inventorySub:last').after('<a class="subSection" id="inventorySub" style="display:none">'+item.name+'</a>');
+			} else {
+				$('#inventory:last').after('<a class="subSection" id="inventorySub" style="display:none">'+item.name+'</a>');
+			}
+		};
+		</script>
+		
+	</head>	
+	<body style="background-color: #333;">
+		<div class="headerBase">
+			<ul class="header" id="pageHeader">
+				<li class="listHead" onmouseover="" style="cursor: pointer;" ><a>Character Sheet</a></li>
+				<li class="listTail" >
+					<svg width="50" height="50">
+						<rect width="50" height="50" fill="#050b28" onclick="toggleMenu()" onmouseover="" style="cursor: pointer;"/>
+					</svg>
+					<svg id="menuBtn" width = "30%" height="50" onclick="toggleMenu()" onmouseover="" style="cursor: pointer;">
+						<rect id="menuRect" width="100%" height="50" fill="#050b28" />
+					</svg>
+				</li>
+			</ul>
+		</div>
+		<div class="sideDiv" id="charMenu">
+			<a class="section" id="inventory" onmouseover="" style="cursor: pointer;">Inventory</a>
+			<a class="section" id="actions" onmouseover="" style="cursor: pointer;">Actions</a>
+			<a class="subSection" id="actionsSub">Action 1</a>
+		</div>
+		<div class="displayDiv" id="sheetDiv">
+			<svg class="display" id="sheetsvg" viewBox="0 0 935 1210"> 
+			
+			<defs>
+				<pattern id="template" patternUnits="userSpaceOnUse" width="935" height="1210">
+				<image xlink:href="characterTemplate.svg" x="0" y="0" width="935" height="1210" />
+				</pattern>
+			</defs>
+
+			<path d="M0 0 L935 0 L935 1210 L 0 1210 Z" fill="url(#template)" />
+			
+			
+			<!-- Basic description -->
+			<text id="name" class="nameType" x = "102" y = "115" />
+			<text id="charClass" class="descType" x = "414" y = "94" />
+			<text id="race" class="descType" x = "414" y = "134" />
+			<text id="background" class="descType" x = "585" y = "94" />
+			<text id="alignment" class="descType" x = "585" y = "134" />
+			<text id="playerName" class="descType" x = "734" y = "94" />
+			<text id="experience" class="descType" x = "734" y = "134" />
+			
+			<!-- Stats -->
+			<text id="stat0" class="statType" x = "87" y = "270" />
+			<text id="stat1" class="statType" x = "87" y = "379" />
+			<text id="stat2" class="statType" x = "87" y = "488" />
+			<text id="stat3" class="statType" x = "87" y = "597" />
+			<text id="stat4" class="statType" x = "87" y = "706" />
+			<text id="stat5" class="statType" x = "87" y = "815" />
+			<text id="statmod0" class="statModType" x = "87" y = "299" />
+			<text id="statmod1" class="statModType" x = "87" y = "409" />
+			<text id="statmod2" class="statModType" x = "87" y = "518" />
+			<text id="statmod3" class="statModType" x = "87" y = "628" />
+			<text id="statmod4" class="statModType" x = "87" y = "737" />
+			<text id="statmod5" class="statModType" x = "87" y = "846" />
+			
+			<!-- Saving Throws -->
+			<text id="savingThrowStrength" class="profType" x = "183" y = "327"/>
+			<text id="savingThrowDexterity" class="profType" x = "183" y = "347"/>
+			<text id="savingThrowConstitution" class="profType" x = "183" y = "368"/>
+			<text id="savingThrowIntelligence" class="profType" x = "183" y = "389"/>
+			<text id="savingThrowWisdom" class="profType" x = "183" y = "410"/>
+			<text id="savingThrowCharisma" class="profType" x = "183" y = "431"/>
+			
+			<circle id="savingThrowProficiencyStrength" cx="159" cy="323" r="5"  fill="black" opacity="0" />
+			<circle id="savingThrowProficiencyDexterity" cx="159" cy="343" r="5"  fill="black" opacity="0" />
+			<circle id="savingThrowProficiencyConstitution" cx="159" cy="364" r="5"  fill="black" opacity="0" />
+			<circle id="savingThrowProficiencyIntelligence" cx="159" cy="385" r="5"  fill="black" opacity="0" />
+			<circle id="savingThrowProficiencyWisdom" cx="159" cy="405" r="5"  fill="black" opacity="0" />
+			<circle id="savingThrowProficiencyCharisma" cx="159" cy="426" r="5"  fill="black" opacity="0" />
+			
+			<!-- Proficiencies -->
+			<text id="acrobatics" class="profType" x = "181" y = "503"/>
+			<text id="animalhandling" class="profType" x = "181" y = "524"/>
+			<text id="arcana" class="profType" x = "181" y = "545"/>
+			<text id="athletics" class="profType" x = "181" y = "565"/>
+			<text id="deception" class="profType" x = "181" y = "586"/>
+			<text id="history" class="profType" x = "181" y = "607"/>
+			<text id="insight" class="profType" x = "181" y = "627"/>
+			<text id="intimidation" class="profType" x = "181" y = "648"/>
+			<text id="investigation" class="profType" x = "181" y = "669"/>
+			<text id="medicine" class="profType" x = "181" y = "689"/>
+			<text id="nature" class="profType" x = "181" y = "710"/>
+			<text id="perception" class="profType" x = "181" y = "730"/>
+			<text id="performance" class="profType" x = "181" y = "751"/>
+			<text id="persuasion" class="profType" x = "181" y = "772"/>
+			<text id="religion" class="profType" x = "181" y = "792"/>
+			<text id="sleightofhand" class="profType" x = "181" y = "813"/>
+			<text id="stealth" class="profType" x = "181" y = "834"/>
+			<text id="survival" class="profType" x = "181" y = "854"/>
+			
+			<circle id="acrobaticsProficiency" cx="159" cy="499" r="5"  fill="black" opacity="0" /> 
+			<circle id="animalhandlingProficiency" cx="159" cy="519" r="5"  fill="black" opacity="0" /> 
+			<circle id="arcanaProficiency" cx="159" cy="540" r="5"  fill="black" opacity="0" />
+			<circle id="athleticsProficiency" cx="159" cy="561" r="5"  fill="black" opacity="0" />
+			<circle id="deceptionProficiency" cx="159" cy="582" r="5"  fill="black" opacity="0" />
+			<circle id="historyProficiency" cx="159" cy="602" r="5"  fill="black" opacity="0" />
+			<circle id="insightProficiency" cx="159" cy="623" r="5"  fill="black" opacity="0" /> 
+			<circle id="intimidationProficiency" cx="159" cy="644" r="5"  fill="black" opacity="0" />
+			<circle id="investigationProficiency" cx="159" cy="664" r="5"  fill="black" opacity="0" /> 
+			<circle id="medicineProficiency" cx="159" cy="685" r="5"  fill="black" opacity="0" />
+			<circle id="natureProficiency" cx="159" cy="705" r="5"  fill="black" opacity="0" /> 
+			<circle id="perceptionProficiency" cx="159" cy="726" r="5"  fill="black" opacity="0" />
+			<circle id="performanceProficiency" cx="159" cy="747" r="5"  fill="black" opacity="0" />
+			<circle id="persuasionProficiency" cx="159" cy="767" r="5"  fill="black" opacity="0" /> 
+			<circle id="religionProficiency" cx="159" cy="788" r="5"  fill="black" opacity="0" />
+			<circle id="sleightofhandProficiency" cx="159" cy="808" r="5"  fill="black" opacity="0" />
+			<circle id="stealthProficiency" cx="159" cy="829" r="5"  fill="black" opacity="0" />
+			<circle id="survivalProficiency" cx="159" cy="850" r="5"  fill="black" opacity="0" />
+			
+			<!-- Sundry -->
+			<text id="proficiencyModifier" class="genericType1" x = "166" y = "277" />
+			<text id="inspiration" class="genericType1" x = "164" y = "220" />
+			<text id="armourClass" class="genericType2" x = "378" y = "246" />
+			<text id="initiative" class="genericType3" x = "464" y = "250" />
+			<text id="movement" class="genericType3" x = "554" y = "250" />
+			<text id="passivePerception" class="genericType1" x = "65" y = "923" />
+			<text id="currentHp" class="genericType4" x = "464" y = "363" />
+			<text id="temporaryHp" class="genericType4" x = "464" y = "444" />
+			<text id="maxHp" class="genericType0" style="opacity:0.3;" x = "513" y = "315" />
+			<text id="totalHitDice" class="genericType0" style="opacity:0.3;" x = "415" y = "499" />
+			<text id="currentHitDice" class="genericType2" x = "403" y = "533" />
+			
+			<circle id="deathsuccess0" cx="535" cy="499" r="7"  fill="green" opacity="0" /> 
+			<circle id="deathsuccess1" cx="555" cy="499" r="7"  fill="green" opacity="0" /> 
+			<circle id="deathsuccess2" cx="575" cy="499" r="7"  fill="green" opacity="0" />
+			
+			<circle id="deathfail0" cx="535" cy="522" r="7"  fill="red" opacity="0" /> 
+			<circle id="deathfail1" cx="555" cy="522" r="7"  fill="red" opacity="0" /> 
+			<circle id="deathfail2" cx="575" cy="522" r="7"  fill="red" opacity="0" />
+
+			<!-- Currency -->
+			<text id="currencyCopper" class="genericType1" x = "372" y = "936" />
+			<text id="currencySilver" class="genericType1" x = "372" y = "976" />
+			<text id="currencyElectrum" class="genericType1" x = "372" y = "1016" />
+			<text id="currencyGold" class="genericType1" x = "372" y = "1055" />
+			<text id="currencyPlatinum" class="genericType1" x = "372" y = "1095" />
+			<path d="M0 0 L935 0 L935 1210 L 0 1210 Z" fill="white" opacity="0"/>
+			</svg>
+		</div>
+	</body>
+</html>
