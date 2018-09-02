@@ -34,6 +34,8 @@ function refresh() {
 	renderHealthConditions();	
 	renderWealth();
 	
+	resetItems();
+	
 	Object.values(currentCharacter.inventory.contents).forEach( item => {
 		addItem(item);
 	});

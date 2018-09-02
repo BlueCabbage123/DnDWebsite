@@ -362,6 +362,14 @@
 				$('#inventory:last').after('<a class="subSection" id="inventorySub" style="display:none">'+item.name+'</a>');
 			}
 		};
+		
+		function resetItems() {
+			while ($('#inventorySub:last').length > 0) {
+				$('#inventorySub:last').remove();
+			}
+		}
+		
+		
 		</script>
 		
 	</head>	
