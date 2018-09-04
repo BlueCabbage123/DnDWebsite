@@ -165,8 +165,8 @@ class Character {
 			} else {
 				return 0;
 			}
-		}, 0) 
-		return itemAC ? itemAC + this.attributeModifier('dexterity') : this.attributeModifier('dexterity');	
+		}, 0); 
+		return itemAC ? itemAC + this.attributeModifier('dexterity') + 10 : this.attributeModifier('dexterity') + 10;	
 	}
 	
 	attributeModifier(attr) {
@@ -262,6 +262,74 @@ class Character {
 	setInventory(inv) {
 		this.inventory = new Inventory(inv);
 	}
+	
+	failDeathSave(n=1) {
+		this.healthCondition['deathSaveFailures'] += n;
+		if (this.healthCondition['deathSaveFailures'] > 3) {
+			this.healthCondition['deathSaveFailures'] = 3;
+		}
+	}
+	
+	succeedDeathSave(n=1) {
+		if (this.healthCondition['currentHp'] <= 0 && this.healthCondition['deathSaveFailures'] < 3) {
+			this.healthCondition['deathSaveSuccesses'] += n;
+			if (this.healthCondition['deathSaveSuccesses'] >= 3) {
+				this.resetCounters();
+				this.healthCondition['currentHp'] = 1;
+			};
+		};
+	}
+	
+	resetCounters() {
+		this.healthCondition['deathSaveFailures'] = 0;
+		this.healthCondition['deathSaveSuccesses'] = 0;
+	}
+	
+	heal(val) {
+		
+		if (val > 0 && this.healthCondition['deathSaveFailures'] < 3) {
+			if (this.healthCondition['currentHp'] == 0) {
+				this.resetCounters();
+			}
+			this.healthCondition['currentHp'] += val;
+			if (this.healthCondition['currentHp'] > this.healthCondition['maxHp']) {
+				this.healthCondition['currentHp'] = this.healthCondition['maxHp'];
+			};
+		};
+	}
+	
+	takeDamage(val) {
+		const conscious = this.healthCondition['currentHp'];
+		let remaining = val;
+		if (this.healthCondition['temporaryHp'] > 0) {
+			this.healthCondition['temporaryHp'] -= remaining;
+			if (this.healthCondition['temporaryHp'] < 0) {
+				remaining = -this.healthCondition['temporaryHp'];
+				this.healthCondition['temporaryHp'] = 0;
+			}
+		};
+		
+		if (remaining > 0 && this.healthCondition['currentHp'] > 0) {
+			this.healthCondition['currentHp'] -= remaining;
+			remaining = 0;
+			if (this.healthCondition['currentHp'] < 0) {
+				remaining = -this.healthCondition['currentHp'];
+				this.healthCondition['currentHp'] = 0;
+			}
+		};
+		
+		if (remaining > 0 && this.healthCondition['currentHp'] <= 0) {
+			if (remaining > this.healthCondition['maxHp']) {
+				this.failDeathSave(3);
+			} else {
+				if (!conscious) {
+					this.failDeathSave();
+				};
+			};
+		};
+		
+	}
+	
 }
 
 class Item {
@@ -337,7 +405,7 @@ class Weapon extends Item {
 	}
 }
 
-
+module.exports = {Character: Character};
 
 
 

@@ -1,7 +1,7 @@
 
 
 const
-	manager = require('./clientmanagers/ClientManager.js'),
+	manager = require('./ClientManager.js'),
 	express = require('express'),
 	serveIndex = require('serve-index'),
 	app = express(),
@@ -21,7 +21,7 @@ const
 			h = Math.floor((d % (86400)) / (60 * 60)),
 			m = Math.floor((d % (3600)) / (60));
 		
-		return '[' + String(h) + ':' + String(m) + ']';
+		return '[' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ']';
 	};
 
 global.__basedir = __dirname;

@@ -28,7 +28,7 @@
 			list-style-type: none;
 			margin: 0;
 			padding: 0;
-			background: #0C1754;
+			background: #00171f;
 			color: #fff;
 			position: fixed;
 			top: 0;
@@ -62,7 +62,7 @@
 		}
 		
 		.header li a:hover {
-			background-color: #1E2B6F;
+			background-color: #003459;
 		}
 		
 		.listHead {
@@ -94,13 +94,23 @@
 		}
 		
 		@keyframes shiftLeftMenu {
-			from {-webkit-transform: translateX(0%);}
-			to {-webkit-transform: translateX(-100%);}
+			from {-webkit-transform: translateX(0px);}
+			to {-webkit-transform: translateX(-300px);}
 		}
 		
 		@keyframes shiftRightMenu {
-			from {-webkit-transform: translateX(-100%);}
-			to {-webkit-transform: translateX(0%);}
+			from {-webkit-transform: translateX(-300px);}
+			to {-webkit-transform: translateX(0px);}
+		}
+		
+		@keyframes transitionFromRed {
+			from {fill: red;}
+			to {fill: black;}
+		}
+		
+		@keyframes transitionFromGreen {
+			from {fill: green;}
+			to {fill: black;}
 		}
 		
 		.displayDiv {
@@ -131,19 +141,18 @@
 		    -ms-transform: translateZ(0);
 		    -o-transform: translateZ(0);
 		    transform: translateZ(0);
-			width: 30%;
+			width: 300px;
 			min-width: 300px;
 			display: none;
 		}
 		
 		.sideDiv {
 			display: none;
-			background-color: #dfdfdf;
+			background-color: #ddd;
 			margin-top: 50px;
 			z-index: 200;
 			position: fixed;
-			width: 30%;
-			min-width: 300px;
+			width: 320px;
 			height: 100%;
 			margin-left: 100%;
 			-webkit-transform: translateZ(0);
@@ -151,12 +160,12 @@
 		    -ms-transform: translateZ(0);
 		    -o-transform: translateZ(0);
 		    transform: translateZ(0);
-			-webkit-transform: translateX(-100%);
+			-webkit-transform: translateX(-300px);
 		}
 		
 		.sideDiv .section {
-			background-color: #eee;
-			color: black;
+			background-color: #004475;
+			color: white;
 			display: block;
 			padding: 12px;
 			font-size: 20px;
@@ -168,6 +177,10 @@
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 		}
+		
+		.sideDiv .section:hover {
+			background-color: #0067b1;
+		}
 
 		.sideDiv .subSection {
 			display: none;
@@ -177,6 +190,30 @@
 			padding: 12px;
 			font-size: 20px;
 			transform: translateX(3px);
+			border-left: 2px solid #0075c9;
+		}
+		
+		.sideDiv ul {
+			margin-left: -3px;
+			overflow: hidden;
+		}
+		
+		#actionsSub {
+			padding-right: 0; 
+			width:190px; 
+			height: 26px;
+			display: inline-block; 
+			cursor: pointer;
+		}
+		
+		#actionsSub:hover {
+			background-color: #eee;
+		}
+		
+		.actionsList {
+			padding-left: 0px; 
+			margin-top: 0px;
+			margin-bottom: 0;
 		}
 		
 		.menuList {
@@ -263,13 +300,29 @@
 			let charID = 'kavaproazheck';
 			const sType = 'characterSheet_' + charID;
 			
+			function requestCharacter(toggleStates) {
+				socket.emit('clientRequesting', charID);
+					
+				socket.on('serverSending', (data) => {
+					socket.emit('clientReceivedData');
+					renderCharacterSheet(JSON.parse(data)),
+					Object.keys(toggleStates).forEach((key) => {
+						if (toggleStates[key]) {
+							$('.' + key + ' li').show();
+						} else {
+							$('.' + key + ' li').hide();
+						}
+					});
+				});
+			}
+			
 			$(document).ready( () => {
 			
 				const 
 					header = $("#pageHeader"),
-					sticky = header.offsetTop;
-					
-				console.log(header)
+					sticky = header.offsetTop,
+					toggle = (name) => {toggleStates[name] = (toggleStates[name] + 1) % 2;},
+					toggleStates = {inventoryList:0, actionsList: 0};
 					
 				window.onscroll = () => {
 					if (window.pageYOffset > sticky) {
@@ -283,18 +336,14 @@
 				});
 
 				socket.on('serverReceivedSocketType', () => {
-					socket.emit('clientRequesting', charID);
-					
-					socket.on('serverSending', (data) => {
-						socket.emit('clientReceivedData');
-						renderCharacterSheet(JSON.parse(data));
-					});
+					requestCharacter(toggleStates);
 				});
 				
 				$('.subSection').hide();
 				
 				$('.section').click((event) => {
-					$('[id=' + event.target.id + 'Sub]').toggle();
+					toggle(event.target.id+'List');
+					$('.'+event.target.id+'List li').toggle();
 				});
 			});
 		</script>
@@ -313,7 +362,7 @@
 			function translateMenuElemLeft(name) {			
 				$('#'+name).css({
 					'display': 'block',
-					'-webkit-transform': 'translateX(-100%)',
+					'-webkit-transform': 'translateX(-300px)',
 					'animation-name': 'shiftLeftMenu',
 					'animation-duration': '0.2s'
 				});	
@@ -321,7 +370,7 @@
 			
 			function translateMenuElemRight(name) {
 				$('#'+name).css({
-					'-webkit-transform': 'translateX(0%)',
+					'-webkit-transform': 'translateX(0px)',
 					'animation-name': 'shiftRightMenu',
 					'animation-duration': '0.2s'
 				});
@@ -355,21 +404,51 @@
 		</script>
 		<script>
 		function addItem(item) {
-			console.log($('#inventorySub:last'));
-			if ($('#inventorySub:last').length > 0) {
-				$('#inventorySub:last').after('<a class="subSection" id="inventorySub" style="display:none">'+item.name+'</a>');
+			
+			if ($('#inventoryHead li:last').length > 0) {
+				$('#inventoryHead li:last').after('<li class="subSection" style="display:none">'+ item.name +'</li>');
 			} else {
-				$('#inventory:last').after('<a class="subSection" id="inventorySub" style="display:none">'+item.name+'</a>');
+				$('#inventoryHead').append('<li class="subSection" style="display:none">'+ item.name +'</li>');
 			}
 		};
 		
 		function resetItems() {
-			while ($('#inventorySub:last').length > 0) {
-				$('#inventorySub:last').remove();
+			while ($('#inventoryHead li:last').length > 0) {
+				$('#inventoryHead li:last').remove();
 			}
 		}
+		function healAction() {
+			$('#currentHp').css({
+				'animation-name': 'transitionFromGreen',
+				'animation-duration': '2s',
+			});
+			setTimeout(() => {
+				$('#currentHp').css('animation-name', '');
+			}, 1000);
+			const heal = $('#actionsHeal input').val();
+			$('#actionsHeal input').val('0');
+			socket.emit('characterAction', charID, {actId: 'heal', payload: Number(heal)});
+		}
+		function takeDamageAction() {
+			$('#currentHp').css({
+				'animation-name': 'transitionFromRed',
+				'animation-duration': '2s',
+			});
+			setTimeout(() => {
+				$('#currentHp').css('animation-name', '');
+			}, 1000);
+			const dmg = $('#actionsTakeDmgInput input').val();
+			$('#actionsTakeDmgInput input').val('0');
+			socket.emit('characterAction', charID, {actId: 'takeDamage', payload: Number(dmg)});
+		}
 		
+		function resetCounters() {
+			socket.emit('characterAction', charID, {actId: 'resetCounters', payload: undefined});
+		}
 		
+		function succeedSaveAction() {
+			socket.emit('characterAction', charID, {actId: 'succeedDeathSave', payload: undefined});
+		}
 		</script>
 		
 	</head>	
@@ -378,19 +457,41 @@
 			<ul class="header" id="pageHeader">
 				<li class="listHead" onmouseover="" style="cursor: pointer;" ><a>Character Sheet</a></li>
 				<li class="listTail" >
-					<svg width="50" height="50">
-						<rect width="50" height="50" fill="#050b28" onclick="toggleMenu()" onmouseover="" style="cursor: pointer;"/>
-					</svg>
 					<svg id="menuBtn" width = "30%" height="50" onclick="toggleMenu()" onmouseover="" style="cursor: pointer;">
-						<rect id="menuRect" width="100%" height="50" fill="#050b28" />
+						<rect id="menuRect" width="100%" height="50" fill="#003459" />
+					</svg>
+					<svg width="50" height="50">					
+						<rect width="50" height="50" fill="#003459" />
+						<rect x="13" y="16" width="24" height="4" fill="#fff" />
+						<rect x="13" y="24" width="24" height="4" fill="#fff" />
+						<rect x="13" y="32" width="24" height="4" fill="#fff" />
+						<rect width="50" height="50" opacity="0" onmouseover="" onclick="toggleMenu()" style="cursor: pointer;"/>
 					</svg>
 				</li>
 			</ul>
 		</div>
 		<div class="sideDiv" id="charMenu">
 			<a class="section" id="inventory" onmouseover="" style="cursor: pointer;">Inventory</a>
+			<ul class="inventoryList" id="inventoryHead" style="padding-left: 0px; margin-top: 0;margin-bottom: 0;">
+			</ul>
 			<a class="section" id="actions" onmouseover="" style="cursor: pointer;">Actions</a>
-			<a class="subSection" id="actionsSub">Action 1</a>
+			<ul class="actionsList">
+				<li class="subSection" id="actionsSub" onmouseover="" onclick="takeDamageAction()">Take Damage</li>
+				<li class="subSection" id="actionsTakeDmgInput" style="width:75px; display: inline-block; border-left-width: 0; transform: translateX(-4px)">
+					<input type="number" style="width: 50px; transform: translateX(1px);" min="0" oninput="validity.valid||(value='');"/>
+				</li>
+			</ul>
+			<ul class="actionsList">
+				<li class="subSection" id="actionsSub" onmouseover="" onclick="healAction()">Heal</li>
+				<li class="subSection" id="actionsHeal" style="width:75px; display: inline-block;  border-left-width: 0; transform: translateX(-4px)">
+					<input type="number" style="width: 50px; transform: translateX(1px);" min="0" oninput="validity.valid||(value='');"/>
+				</li>
+			<ul class="actionsList" style="margin-left: 0;">
+				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="succeedSaveAction()">Succeed Death Save</li>
+			</ul>
+			<ul class="actionsList" style="margin-left: 0;">
+				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="resetCounters()">Reset Death Saves</li>
+			</ul>
 		</div>
 		<div class="displayDiv" id="sheetDiv">
 			<svg class="display" id="sheetsvg" viewBox="0 0 935 1210"> 

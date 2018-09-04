@@ -1,5 +1,6 @@
 
 const 
+	characterManager = require('./CharacterManager.js'),
 	_ = require('underscore'),
 	fs = require('fs');
 
@@ -37,8 +38,9 @@ class CharacterDisplayManager extends ClientManager {
 	constructor(managerId, server) {
 		super(managerId, server);
 		this.type = 'characterSheet';
+		this.characterManager = new characterManager.CharacterManager();
 		
-		fs.watch('./characterinfo/', _.throttle((event, filename) => {
+		fs.watch('./characterinfo/', (event, filename) => {
 			if (filename) {
 				const dataId = filename.substr(0, filename.indexOf('.'));
 				
@@ -51,10 +53,7 @@ class CharacterDisplayManager extends ClientManager {
 				this.io.emit('serverSentData', './characterinfo/'+ dataId +'.json');
 			
 			}
-		},
-		750,
-		{trailing: false}
-		));
+		});
 	}
 	
 	setListener(socket) {
@@ -64,8 +63,12 @@ class CharacterDisplayManager extends ClientManager {
 			socket.on('clientRequesting', (characterIDRequest) => {
 				this.sendJSONData(__basedir + '/characterinfo/' + characterIDRequest + '.json', 'serverSending', socket);
 			});
+			
+			socket.on('characterAction', (characterID, action) => {
+				this.characterManager.setAction(characterID, action);
+			});
+			
 		};
-		super.setListener(socket);
 	}
 }
 

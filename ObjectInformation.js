@@ -86,7 +86,7 @@ const
 			description: 'A small leather pouch',
 			value: 10,
 			tags: ['inventory', 'pouch'],
-			contents: {'weapondagger': exampleWeapon, 'signetring': exampleItem}
+			contents: {'weapondagger': exampleWeapon}
 		} // Store as list of items
 	};
 
