@@ -297,11 +297,15 @@
 		<script>
 		
 			const socket = io();
-			let charID = 'kavaproazheck';
-			const sType = 'characterSheet_' + charID;
+			let charID = '';
+			const 
+				sType = 'characterSheet_' + charID,
+				toggleStates = {inventoryList:0, actionsList: 0};
 			
-			function requestCharacter(toggleStates) {
+			function requestCharacter() {
 				socket.emit('clientRequesting', charID);
+				
+				socket.on('dataNotFound', () => {clearSheet();});
 					
 				socket.on('serverSending', (data) => {
 					socket.emit('clientReceivedData');
@@ -319,18 +323,8 @@
 			$(document).ready( () => {
 			
 				const 
-					header = $("#pageHeader"),
-					sticky = header.offsetTop,
-					toggle = (name) => {toggleStates[name] = (toggleStates[name] + 1) % 2;},
-					toggleStates = {inventoryList:0, actionsList: 0};
-					
-				window.onscroll = () => {
-					if (window.pageYOffset > sticky) {
-						header.classList.add('sticky');
-					} else {
-						header.classList.remove('sticky');
-					};
-				};
+					toggle = (name) => {toggleStates[name] = (toggleStates[name] + 1) % 2;};
+
 				socket.on('serverReadyForSocketType', () => {
 					socket.emit('clientSentSocketType', sType);
 				});
@@ -449,6 +443,11 @@
 		function succeedSaveAction() {
 			socket.emit('characterAction', charID, {actId: 'succeedDeathSave', payload: undefined});
 		}
+		
+		function setCharId() {
+			charID = $('#actionsGetChar').val();
+			requestCharacter();
+		}
 		</script>
 		
 	</head>	
@@ -487,11 +486,20 @@
 					<input type="number" style="width: 50px; transform: translateX(1px);" min="0" oninput="validity.valid||(value='');"/>
 				</li>
 			<ul class="actionsList" style="margin-left: 0;">
-				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="succeedSaveAction()">Succeed Death Save</li>
+				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="succeedSaveAction()">Pass Death Save</li>
 			</ul>
 			<ul class="actionsList" style="margin-left: 0;">
 				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="resetCounters()">Reset Death Saves</li>
 			</ul>
+			<ul class="actionsList" style="margin-left: 0;">
+				<li class="subSection" id="actionsSub" >
+					<input id="actionsGetChar" type="text" style="width: 166px; transform: translateX(1px);" oninput="validity.valid||(value='');"/>
+				</li>
+				<li class="subSection" style="width:75px; display: inline-block;  border-left-width: 0; transform: translateX(-4px)">
+					<button style="width: 57px; height: 23px; transform: translateX(1px);" onclick="setCharId()">Fetch</button>
+				</li>
+			</ul>
+			
 		</div>
 		<div class="displayDiv" id="sheetDiv">
 			<svg class="display" id="sheetsvg" viewBox="0 0 935 1210"> 

@@ -199,9 +199,16 @@ function setDotOpacity(dotid, opacity) {
 	$('#'+dotid).css('opacity', opacity);
 }
 
-function renderCharacterSheet(character) {
+function clearSheet() {
+	$('#sheetsvg').find('text').html('');
+}
 
-	currentCharacter = new Character(character);
+function renderCharacterSheet(character) {
+	try {
+		currentCharacter = new Character(character);
+	} catch (e) {
+		clearSheet();
+	}
 
 	refresh();
 }

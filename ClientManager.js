@@ -1,5 +1,13 @@
 
 const 
+	timeStamp = () => {
+		let 
+			d = Math.floor((Date.now() + 36000000) / 1000),
+			h = Math.floor((d % (86400)) / (60 * 60)),
+			m = Math.floor((d % (3600)) / (60));
+		
+		return '[' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ']';
+	},
 	characterManager = require('./CharacterManager.js'),
 	_ = require('underscore'),
 	fs = require('fs');
@@ -18,13 +26,18 @@ class ClientManager {
 
 		socket.on('disconnect', () => {
 			delete this.connections[socket.id];
+			console.log(timeStamp() + ' User disconnected (ID: ' + socket.id + ')');
 		});
 	}
 	
 	sendJSONData(filename, eventName, socket) {
 		fs.readFile(filename, 'utf8', (err, data) => {
-			if (err) throw err;
-			this.io.to(`${socket.id}`).emit(eventName, data);
+			if (err) {
+				this.io.to(`${socket.id}`).emit('dataNotFound');
+				console.log('datanotfound');
+			} else {
+				this.io.to(`${socket.id}`).emit(eventName, data);
+			};
 		});
 	}
 	

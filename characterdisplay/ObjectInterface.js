@@ -405,7 +405,9 @@ class Weapon extends Item {
 	}
 }
 
-module.exports = {Character: Character};
+try {
+	module.exports = {Character: Character};
+} catch (e) {}
 
 
 

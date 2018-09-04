@@ -6,6 +6,7 @@ const
 	serveIndex = require('serve-index'),
 	app = express(),
 	http = require('http').Server(app),
+	port = 8080,
 	io = require('socket.io')(http),
 	characterDisplays = new manager.CharacterDisplayManager('characterSheet', io),
 	designateSocketManager = (socket, sType) => {
@@ -31,13 +32,13 @@ app.use('/', serveIndex('./characterdisplay')); // shows you the file list
 app.use('/', express.static('./characterdisplay')); // serve the actual files
 
 io.on('connection', (socket) => {
-	console.log(timeStamp() + ' A user connected');
+	console.log(timeStamp() + ' User connected (ID: ' + socket.id + ')');
 	socket.on('clientSentSocketType', (sType) => {
 		designateSocketManager(socket, sType);
 	});
 	io.to(`${socket.id}`).emit('serverReadyForSocketType');
 });
 
-http.listen(8080, () => {
-	console.log(timeStamp() + ' listening on port 8080');
+http.listen(port, () => {
+	console.log(timeStamp() + ' Listening on port ' + String(port));
 });
