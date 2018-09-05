@@ -51,7 +51,7 @@ class CharacterDisplayManager extends ClientManager {
 	constructor(managerId, server) {
 		super(managerId, server);
 		this.type = 'characterSheet';
-		this.characterManager = new characterManager.CharacterManager();
+		this.characterManager = new characterManager.CharacterManager(this.io);
 		
 		fs.watch('./characterinfo/', (event, filename) => {
 			if (filename) {
@@ -61,11 +61,8 @@ class CharacterDisplayManager extends ClientManager {
 					if (this.connections[s]['socketType'].substr(this.connections[s]['socketType'].indexOf('_')+1) == dataId) {
 						this.sendJSONData(__basedir + '/characterinfo/' + dataId + '.json', 'serverSending', this.connections[s]['socket']);
 					};
-				});
-			
-				this.io.emit('serverSentData', './characterinfo/'+ dataId +'.json');
-			
-			}
+				});		
+			};
 		});
 	}
 	
@@ -78,7 +75,11 @@ class CharacterDisplayManager extends ClientManager {
 			});
 			
 			socket.on('characterAction', (characterID, action) => {
-				this.characterManager.setAction(characterID, action);
+				if (this.characterManager.characters[characterID]) {
+					this.characterManager.setAction(characterID, action, socket);
+				} else {
+					this.io.to(`${socket.id}`).emit('dataNotFound');
+				}
 			});
 			
 		};

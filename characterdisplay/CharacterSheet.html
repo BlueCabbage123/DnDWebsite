@@ -98,6 +98,16 @@
 			to {-webkit-transform: translateX(-300px);}
 		}
 		
+		@keyframes shiftLeftMenuBox {
+			from {-webkit-transform: translateX(-50px);}
+			to {-webkit-transform: translateX(-300px);}
+		}
+		
+		@keyframes shiftRightMenuBox {
+			from {-webkit-transform: translateX(-300px);}
+			to {-webkit-transform: translateX(-50px);}
+		}
+		
 		@keyframes shiftRightMenu {
 			from {-webkit-transform: translateX(-300px);}
 			to {-webkit-transform: translateX(0px);}
@@ -105,6 +115,11 @@
 		
 		@keyframes transitionFromRed {
 			from {fill: red;}
+			to {fill: black;}
+		}
+		
+		@keyframes transitionFromBlue {
+			from {fill: #51aeff;}
 			to {fill: black;}
 		}
 		
@@ -119,12 +134,15 @@
 			min-width: 750px;
 			margin-left: 50%;
 			z-index: -1;	
+			-webkit-transform: translateX(-50%);			
+		}
+		
+		#sheetdiv {
 			-webkit-transform: translateZ(0);
 		    -moz-transform: translateZ(0);
 		    -ms-transform: translateZ(0);
 		    -o-transform: translateZ(0);
 		    transform: translateZ(0);
-			-webkit-transform: translateX(-50%);			
 		}
 		
 		.display {
@@ -303,21 +321,7 @@
 				toggleStates = {inventoryList:0, actionsList: 0};
 			
 			function requestCharacter() {
-				socket.emit('clientRequesting', charID);
-				
-				socket.on('dataNotFound', () => {clearSheet();});
-					
-				socket.on('serverSending', (data) => {
-					socket.emit('clientReceivedData');
-					renderCharacterSheet(JSON.parse(data)),
-					Object.keys(toggleStates).forEach((key) => {
-						if (toggleStates[key]) {
-							$('.' + key + ' li').show();
-						} else {
-							$('.' + key + ' li').hide();
-						}
-					});
-				});
+				socket.emit('clientRequesting', charID);	
 			}
 			
 			$(document).ready( () => {
@@ -328,12 +332,31 @@
 				socket.on('serverReadyForSocketType', () => {
 					socket.emit('clientSentSocketType', sType);
 				});
-
-				socket.on('serverReceivedSocketType', () => {
+				
+				socket.on('dataNotFound', () => {
+					$('#actionsGetChar').val('');
+					clearSheet();
+				});
+				
+				socket.on('serverSending', (data) => {
+					$('#actionsGetChar').val('');
+					socket.emit('clientReceivedData');
+					renderCharacterSheet(JSON.parse(data)),
+					Object.keys(toggleStates).forEach((key) => {
+						if (toggleStates[key]) {
+							$('.' + key + ' li').show();
+						} else {
+							$('.' + key + ' li').hide();
+						}
+					});
+				});
+				
+				socket.on('actionReceived', () => {
 					requestCharacter(toggleStates);
 				});
 				
 				$('.subSection').hide();
+				$('#actionsGetChar').val('');
 				
 				$('.section').click((event) => {
 					toggle(event.target.id+'List');
@@ -353,12 +376,28 @@
 				}
 			}
 			
+			function translateMenuBoxLeft() {
+				$('#menuBox').css({
+					'-webkit-transform': 'translateX(-300px)',
+					'animation-name': 'shiftLeftMenuBox',
+					'animation-duration': '0.5s'
+				});
+			}
+			
+			function translateMenuBoxRight() {
+				$('#menuBox').css({
+					'-webkit-transform': 'translateX(-50px)',
+					'animation-name': 'shiftRightMenuBox',
+					'animation-duration': '0.5s'
+				});
+			}
+			
 			function translateMenuElemLeft(name) {			
 				$('#'+name).css({
 					'display': 'block',
 					'-webkit-transform': 'translateX(-300px)',
 					'animation-name': 'shiftLeftMenu',
-					'animation-duration': '0.2s'
+					'animation-duration': '0.5s'
 				});	
 			}
 			
@@ -366,7 +405,7 @@
 				$('#'+name).css({
 					'-webkit-transform': 'translateX(0px)',
 					'animation-name': 'shiftRightMenu',
-					'animation-duration': '0.2s'
+					'animation-duration': '0.5s'
 				});
 
 				setTimeout(() => $('#'+name).css('none', 300));
@@ -375,23 +414,25 @@
 			
 			function shiftLeftDisplay() {
 				translateMenuElemLeft('charMenu');
+				translateMenuBoxLeft();
 				translateMenuElemLeft('menuBtn');
 				
 				$('#sheetDiv').css({
 					'-webkit-transform': 'translateX(0%)',
 					'animation-name': 'shiftLeft',
-					'animation-duration': '0.2s',
+					'animation-duration': '0.5s',
 					'margin-left': '0'
 				});
 			}
 			
 			function shiftRightDisplay() {
 				translateMenuElemRight('charMenu');
+				translateMenuBoxRight();
 				translateMenuElemRight('menuBtn');
 				$('#sheetDiv').css({
 					'-webkit-transform': 'translateX(-50%)',
 					'animation-name': 'shiftRight',
-					'animation-duration': '0.2s',
+					'animation-duration': '0.5s',
 					'margin-left': '50%'
 				});
 			}
@@ -412,28 +453,62 @@
 			}
 		}
 		function healAction() {
-			$('#currentHp').css({
-				'animation-name': 'transitionFromGreen',
-				'animation-duration': '2s',
-			});
-			setTimeout(() => {
-				$('#currentHp').css('animation-name', '');
-			}, 1000);
 			const heal = $('#actionsHeal input').val();
-			$('#actionsHeal input').val('0');
-			socket.emit('characterAction', charID, {actId: 'heal', payload: Number(heal)});
+			
+			if (Number(heal)) {	
+				$('#currentHp').css({
+					'animation-name': 'transitionFromGreen',
+					'animation-duration': '2s',
+				});
+				setTimeout(() => {
+					$('#currentHp').css('animation-name', '');
+				}, 1000);
+				socket.emit('characterAction', charID, {actId: 'heal', payload: Number(heal)});
+			};
+			$('#actionsHeal input').val('0');		
 		}
+		
 		function takeDamageAction() {
-			$('#currentHp').css({
-				'animation-name': 'transitionFromRed',
-				'animation-duration': '2s',
-			});
-			setTimeout(() => {
-				$('#currentHp').css('animation-name', '');
-			}, 1000);
 			const dmg = $('#actionsTakeDmgInput input').val();
-			$('#actionsTakeDmgInput input').val('0');
-			socket.emit('characterAction', charID, {actId: 'takeDamage', payload: Number(dmg)});
+			
+			if (Number(dmg)) {
+				if (Number($('#temporaryHp').html()) > 0) {
+					$('#temporaryHp').css({
+						'animation-name': 'transitionFromBlue',
+						'animation-duration': '2s',
+					});
+					setTimeout(() => {
+						$('#temporaryHp').css('animation-name', '');
+					}, 1000);
+				};
+				if (dmg > Number($('#temporaryHp').html())) {
+					$('#currentHp').css({
+						'animation-name': 'transitionFromRed',
+						'animation-duration': '2s',
+					});
+					setTimeout(() => {
+						$('#currentHp').css('animation-name', '');
+					}, 1000);
+				};
+				socket.emit('characterAction', charID, {actId: 'takeDamage', payload: Number(dmg)});
+			};			
+			$('#actionsTakeDmgInput input').val('0');	
+		}
+		
+		function gainTempAction() {
+			const temp = $('#actionsGainTempHp input').val();
+			
+			if (temp) {
+				$('#temporaryHp').css({
+					'animation-name': 'transitionFromBlue',
+					'animation-duration': '2s',
+				});
+				setTimeout(() => {
+					$('#temporaryHp').css('animation-name', '');
+				}, 1000);
+				socket.emit('characterAction', charID, {actId: 'gainTempHp', payload: Number(temp)});
+			}
+			$('#actionsGainTempHp input').val('0');
 		}
 		
 		function resetCounters() {
@@ -459,7 +534,7 @@
 					<svg id="menuBtn" width = "30%" height="50" onclick="toggleMenu()" onmouseover="" style="cursor: pointer;">
 						<rect id="menuRect" width="100%" height="50" fill="#003459" />
 					</svg>
-					<svg width="50" height="50">					
+					<svg id="menuBox" width="50" height="50">					
 						<rect width="50" height="50" fill="#003459" />
 						<rect x="13" y="16" width="24" height="4" fill="#fff" />
 						<rect x="13" y="24" width="24" height="4" fill="#fff" />
@@ -481,22 +556,29 @@
 				</li>
 			</ul>
 			<ul class="actionsList">
-				<li class="subSection" id="actionsSub" onmouseover="" onclick="healAction()">Heal</li>
+				<li class="subSection" id="actionsSub" onmouseover="" onclick="healAction()">Heal HP</li>
 				<li class="subSection" id="actionsHeal" style="width:75px; display: inline-block;  border-left-width: 0; transform: translateX(-4px)">
 					<input type="number" style="width: 50px; transform: translateX(1px);" min="0" oninput="validity.valid||(value='');"/>
 				</li>
-			<ul class="actionsList" style="margin-left: 0;">
-				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="succeedSaveAction()">Pass Death Save</li>
+			</ul>
+			<ul class="actionsList">
+				<li class="subSection" id="actionsSub" onmouseover="" onclick="gainTempAction()">Gain Temporary HP</li>
+				<li class="subSection" id="actionsGainTempHp" style="width:75px; display: inline-block;  border-left-width: 0; transform: translateX(-4px)">
+					<input type="number" style="width: 50px; transform: translateX(1px);" min="0" oninput="validity.valid||(value='');"/>
+				</li>
 			</ul>
 			<ul class="actionsList" style="margin-left: 0;">
-				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%;" onclick="resetCounters()">Reset Death Saves</li>
+				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%; margin-left: -3px;" onclick="succeedSaveAction()">Pass Death Save</li>
 			</ul>
 			<ul class="actionsList" style="margin-left: 0;">
-				<li class="subSection" id="actionsSub" >
-					<input id="actionsGetChar" type="text" style="width: 166px; transform: translateX(1px);" oninput="validity.valid||(value='');"/>
+				<li class="subSection" id="actionsSub" onmouseover="" style="width: 100%; margin-left: -3px;" onclick="resetCounters()">Reset Death Saves</li>
+			</ul>
+			<ul class="actionsList" style="margin-left: 0;">
+				<li class="subSection" id="actionsSub" style="cursor: default; margin-left: -3px;">
+					<input id="actionsGetChar" type="text" style="width: 166px; transform: translateX(1px); " placeholder="Insert Character ID" oninput="validity.valid||(value='');"/>
 				</li>
 				<li class="subSection" style="width:75px; display: inline-block;  border-left-width: 0; transform: translateX(-4px)">
-					<button style="width: 57px; height: 23px; transform: translateX(1px);" onclick="setCharId()">Fetch</button>
+					<button style="width: 57px; height: 23px; transform: translateX(0px);" onclick="setCharId()">Fetch</button>
 				</li>
 			</ul>
 			

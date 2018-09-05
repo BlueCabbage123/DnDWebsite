@@ -6,7 +6,8 @@ const
 
 class CharacterManager {
 
-	constructor() {
+	constructor(server) {
+		this.io = server;
 		this.characters = {};
 		this.actions = {
 			'takeDamage': (charID, action) => {
@@ -21,6 +22,9 @@ class CharacterManager {
 			'succeedDeathSave': (charID, action) => {
 				this.characters[charID].succeedDeathSave(action.payload);
 			},
+			'gainTempHp': (charID, action) => {
+				this.characters[charID].gainTempHp(action.payload);
+			},
 		};
 		fs.readdirSync(characterDir).forEach(file => {
 			try {
@@ -32,9 +36,14 @@ class CharacterManager {
 		});
 	}	
 	
-	setAction(charID, action) {
-		this.actions[action.actId](charID, action);
-		this.writeCharacter(charID);
+	setAction(charID, action, socket) {
+		if (this.actions[action.actId]) {
+			this.actions[action.actId](charID, action);
+			this.writeCharacter(charID);
+			this.io.to(`${socket.id}`).emit('actionReceived');
+		} else {
+			this.io.to(`${socket.id}`).emit('dataNotFound');
+		}
 	}
 	
 	writeCharacter(charID) {

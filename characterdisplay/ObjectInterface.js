@@ -285,6 +285,13 @@ class Character {
 		this.healthCondition['deathSaveSuccesses'] = 0;
 	}
 	
+	gainTempHp(val) {
+		if (this.healthCondition['currentHp'] > 0 && val > this.healthCondition['temporaryHp']) {
+			this.healthCondition['temporaryHp'] = val;
+		};
+		
+	}
+	
 	heal(val) {
 		
 		if (val > 0 && this.healthCondition['deathSaveFailures'] < 3) {
@@ -303,6 +310,7 @@ class Character {
 		let remaining = val;
 		if (this.healthCondition['temporaryHp'] > 0) {
 			this.healthCondition['temporaryHp'] -= remaining;
+			remaining = 0;
 			if (this.healthCondition['temporaryHp'] < 0) {
 				remaining = -this.healthCondition['temporaryHp'];
 				this.healthCondition['temporaryHp'] = 0;

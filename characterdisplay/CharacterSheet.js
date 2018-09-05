@@ -201,6 +201,7 @@ function setDotOpacity(dotid, opacity) {
 
 function clearSheet() {
 	$('#sheetsvg').find('text').html('');
+	$('#sheetsvg').find('circle').css('opacity', '0');
 }
 
 function renderCharacterSheet(character) {
